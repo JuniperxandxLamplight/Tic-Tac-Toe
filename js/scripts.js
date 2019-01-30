@@ -69,18 +69,6 @@ Game.prototype.endTurn = function() {
   this.turn = this.turn == 1 ? 2 : 1;
 }
 
-Game.prototype.gameOver = function() {
-  var over = false;
-
-  if ()
-
-  if (over) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 function checkGame(squares) {
   if (squares.length >= 5) {
     for (var i = 0; i < squares.length - 2; i++) {
@@ -88,25 +76,26 @@ function checkGame(squares) {
         if (squares[i].markedBy() == squares[j].markedBy()) {
           for (var k = j + 1; k < squares.length; k++) {
             if (squares[i].markedBy() == squares[k].markedBy()) {
-              
-
+              if (((squares[i].x == squares[j].x) && (squares[i].x == squares[k].x)) || ((squares[i].y == squares[j].y) && (squares[i].y == squares[k].y)) || ((squares[i].x == squares[i].y) && (squares[j].x == squares[j].y) && (squares[k].x == squares[k].y)) || ((squares[i].x == (2 - squares[i].y)) && (squares[j].x == (2 - squares[j].y)) && (squares[k].x == (2 - squares[k].y)))) {
+                $("#space" + squares[i].x + squares[i].y).css("background-color","red");
+                $("#space" + squares[j].x + squares[j].y).css("background-color","red");
+                $("#space" + squares[k].x + squares[k].y).css("background-color","red");
+                return squares[i].markedBy();
+              }
             }
           }
         }
-
       }
-
     }
   }
-
-  return;
+  return false;
 }
 
 
 var player = 1;
 var winner = 0;
 var squaresFilled = [];
-var example;
+var done = false;;
 
 $(document).ready(function() {
   var newGame = new Game;
@@ -122,18 +111,17 @@ $(document).ready(function() {
     var activeSpace = newBoard.find(this.id[5],this.id[6]);
     activeSpace.mark(newGame[activePlayer].mark);
     squaresFilled.push(activeSpace);
+    $(this).removeClass("openSquare");
+    $(this).addClass("clickedOne");
 
-    checkGame(squaresFilled);
+    done = checkGame(squaresFilled);
 
-    if (newGame.gameOver()) {
-      break;
+    if (done) {
+      $("#result").text("Winner: Player " + newGame.turn);
+      $(".openSquare").addClass("clickedOne");
+      $(".openSquare").removeClass("openSquare");
+    } else {
+      newGame.endTurn();
     }
-    newGame.endTurn();
-    if (winner == 1) {
-
-    } else if (winner == 2) {
-
-    }
-
   });
 });
