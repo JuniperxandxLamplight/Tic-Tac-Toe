@@ -1,0 +1,25 @@
+.openSquare {
+  height: 200px;
+  width: 200px;
+  background-color: yellow;
+  margin: 20px;
+}
+
+.clickedOne {
+  height: 200px;
+  width: 200px;
+  margin: 20px;
+}
+
+.clickedTwo {
+  height: 200px;
+  width: 200px;
+  margin: 20px;
+}
+body {
+  text-align: center;
+}
+
+.markedCell {
+  font-size: 120px;
+}
