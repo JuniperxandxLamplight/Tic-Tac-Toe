@@ -1,8 +1,40 @@
+body{
+  font-family: serif;
+  background-image: url("../img/lights.jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+h1{
+  font-size: 50px;
+  text-shadow: 0px 3px 5px darkgray;
+}
+
+#board{
+  margin-left: 20%;
+}
+
+.well{
+  box-shadow: 0px 7px 15px black;
+  background-color: #fff4e0;
+}
+
 .openSquare {
   height: 200px;
   width: 200px;
-  background-color: yellow;
+  background-image: linear-gradient(#c570ff, #9800ff);
   margin: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 5px 10px black;
+}
+
+.btn {
+  background-image: linear-gradient(white, #f6eaff);
+  box-shadow: 0px 3px 7px black;
+}
+
+.btn:hover{
+  background-image: linear-gradient(#edd6ff, #d7a3ff);
 }
 
 #result, #board, #dif-well, #new-game {
@@ -12,8 +44,10 @@
 .clickedOne {
   height: 200px;
   width: 200px;
-  background-color: yellow;
+  background-image: linear-gradient(#c570ff, #9800ff);
   margin: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 5px 10px black;
 }
 
 .clickedTwo {

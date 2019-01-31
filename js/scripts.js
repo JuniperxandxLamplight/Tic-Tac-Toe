@@ -69,9 +69,9 @@ function checkGame(squares) {
           for (var k = j + 1; k < squares.length; k++) {
             if (squares[i].markedBy() == squares[k].markedBy()) {
               if (((squares[i].x == squares[j].x) && (squares[i].x == squares[k].x)) || ((squares[i].y == squares[j].y) && (squares[i].y == squares[k].y)) || ((squares[i].x == squares[i].y) && (squares[j].x == squares[j].y) && (squares[k].x == squares[k].y)) || ((squares[i].x == (2 - squares[i].y)) && (squares[j].x == (2 - squares[j].y)) && (squares[k].x == (2 - squares[k].y)))) {
-                $("#space" + squares[i].x + squares[i].y).css("background-color","red");
-                $("#space" + squares[j].x + squares[j].y).css("background-color","red");
-                $("#space" + squares[k].x + squares[k].y).css("background-color","red");
+                $("#space" + squares[i].x + squares[i].y).css("color","white");
+                $("#space" + squares[j].x + squares[j].y).css("color","white");
+                $("#space" + squares[k].x + squares[k].y).css("color","white");
                 return squares[i].markedBy();
               }
             }
@@ -112,6 +112,12 @@ function twoPlayer(game,board) {
     done = checkGame(squaresFilled);
     if (done) {
       $("#result").text("Winner: Player " + game.turn);
+      $(".openSquare").addClass("clickedOne");
+      $(".openSquare").removeClass("openSquare");
+      gameOver = true;
+      $("#new-game").toggle();
+    } else if (squaresFilled.length == 9) {
+      $("#result").text("DRAW: No Winner");
       $(".openSquare").addClass("clickedOne");
       $(".openSquare").removeClass("openSquare");
       gameOver = true;
@@ -161,16 +167,18 @@ function easyMode(game,board) {
     allSpaces.splice((parseInt(this.id[5]) * 3 + parseInt(this.id[6])) , 1, '');
     openSpaces = allSpaces.filter(arr => arr != '');
     if (done) {
-      if (game.turn == 1) {
-        $("#result").text("Winner: Human");
-      } else {
-        $("#result").text("Winner: Computer");
-      }
+      $("#result").text("Winner: Human");
       $(".openSquare").addClass("clickedOne");
       $(".openSquare").removeClass("openSquare");
       gameOver = true;
       $("#new-game").toggle();
-    } else {
+    } else if (squaresFilled.length == 9) {
+      $("#result").text("DRAW: No Winner");
+      $(".openSquare").addClass("clickedOne");
+      $(".openSquare").removeClass("openSquare");
+      gameOver = true;
+      $("#new-game").toggle();
+    } else if (!gameOver) {
       game.endTurn();
 
 
@@ -190,6 +198,13 @@ function easyMode(game,board) {
       compSquare.addClass("clickedOne");
 
       done = checkGame(squaresFilled);
+      if (done) {
+        $("#result").text("Winner: Computer");
+        $(".openSquare").addClass("clickedOne");
+        $(".openSquare").removeClass("openSquare");
+        gameOver = true;
+        $("#new-game").toggle();
+      }
       allSpaces.splice((parseInt(compSquare[0].id[5]) * 3 + parseInt(compSquare[0].id[6])) , 1, '');
       openSpaces = allSpaces.filter(arr => arr != '');
       game.endTurn();
@@ -276,6 +291,9 @@ function hardMode(game,board) {
           compSquare = $("#space" + (3 - (squaresFilled[0].x + squaresFilled[4].x)) + (squaresFilled[4].y));
         } else if ((squaresFilled[4].y == squaresFilled[2].y) && squaresFilled[4].y != 1) {
           compSquare = $("#space" + (3 - (squaresFilled[4].x + squaresFilled[2].x)) + (squaresFilled[4].y));
+        } else {
+          var index = openSpaces[parseInt(Math.random()*4)];
+          compSquare = $("#space" + index.x + index.y);
         }
       } else {
         if ((((squaresFilled[1].x == squaresFilled[3].x) && squaresFilled[1].x != 1) || ((squaresFilled[1].y == squaresFilled[3].y) && squaresFilled[1].y != 1 )) && (!(((squaresFilled[4].x == (3 - (squaresFilled[1].x + squaresFilled[3].x))) && (squaresFilled[4].y == squaresFilled[1].y)) || ((squaresFilled[4].x == squaresFilled[1].x) && (squaresFilled[4].y == (3 - (squaresFilled[1].y + squaresFilled[3].y))))))) {
@@ -297,7 +315,13 @@ function hardMode(game,board) {
     } else if (squaresFilled.length == 7) {
       if ((squaresFilled[1].x == 1) && (squaresFilled[1].y == 1)) {
         if (!((squaresFilled[6].x == (2 - squaresFilled[5].x)) && (squaresFilled[6].y == (2 - squaresFilled[5].y)))) {
-          compSquare = $("#space" + (2 - squaresFilled[5].x) + (2 - squaresFilled[5].y));
+          if ($("#space" + (2 - squaresFilled[5].x) + (2 - squaresFilled[5].y)).hasClass("clickedOne")) {
+            var index = openSpaces[parseInt(Math.random()*2)];
+            compSquare = $("#space" + index.x + index.y);
+          } else {
+            compSquare = $("#space" + (2 - squaresFilled[5].x) + (2 - squaresFilled[5].y));
+          }
+
         } else {
           var index = openSpaces[parseInt(Math.random()*2)];
           compSquare = $("#space" + index.x + index.y);
@@ -305,6 +329,7 @@ function hardMode(game,board) {
       } else {
         var index = openSpaces[parseInt(Math.random()*2)];
         compSquare = $("#space" + index.x + index.y);
+
       }
     } else {
       if (!done) {
