@@ -5,7 +5,7 @@
   margin: 20px;
 }
 
-#result, #board, #dif-well {
+#result, #board, #dif-well, #new-game {
   display: none;
 }
 

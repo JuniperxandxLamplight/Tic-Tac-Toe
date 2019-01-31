@@ -27,7 +27,7 @@ Board.prototype.build = function() {
   for (var i = 0; i < 3; i++) {
     boardString += "<div class='row'>";
     for (var j = 0; j < 3; j++) {
-      boardString += "<div value = '"+i+j+"' class='openSquare col-md-4' id='space" + i + j + "'></div>";
+      boardString += "<div class='openSquare col-md-4' id='space" + i + j + "'></div>";
       currentSpace = new Space(i,j);
       spaces.push(currentSpace);
     }
@@ -87,6 +87,7 @@ function checkGame(squares) {
 var player = 1;
 var winner = 0;
 var squaresFilled = [];
+var openSpaces = [];
 var done = false;;
 
 function twoPlayer(game,board) {
@@ -113,6 +114,8 @@ function twoPlayer(game,board) {
       $("#result").text("Winner: Player " + game.turn);
       $(".openSquare").addClass("clickedOne");
       $(".openSquare").removeClass("openSquare");
+      gameOver = true;
+      $("#new-game").toggle();
     } else {
       game.endTurn();
       $("#result").text("Player " + game.turn + "'s Turn");
@@ -165,6 +168,8 @@ function easyMode(game,board) {
       }
       $(".openSquare").addClass("clickedOne");
       $(".openSquare").removeClass("openSquare");
+      gameOver = true;
+      $("#new-game").toggle();
     } else {
       game.endTurn();
 
@@ -174,11 +179,11 @@ function easyMode(game,board) {
       compY = openSpaces[compChoice].y;
       compSquare = $("#space" + compX + compY);
 
-      var activePlayer = "player" + game.turn;
+      activePlayer = "player" + game.turn;
 
       $(compSquare).append("<h1 class='markedCell'>" + game[activePlayer].mark + "</h1>");
 
-      var activeSpace = board.find(compSquare[0].id[5],compSquare[0].id[6]);
+      activeSpace = board.find(compSquare[0].id[5],compSquare[0].id[6]);
       activeSpace.mark(game[activePlayer].mark);
       squaresFilled.push(activeSpace);
       compSquare.removeClass("openSquare");
@@ -197,12 +202,9 @@ function hardMode(game,board) {
   $("#result").toggle();
   $("#board").toggle();
   var allSpaces = board.spaces;
-  var openSpaces = [];
   var markedSpaces = [];
   var gameOver = false;
-  var compChoice;
-  var compX;
-  var compY;
+  var compChoice = [];
 
   $("#board").on("click",".openSquare", function() {
     var activePlayer = "player" + game.turn;
@@ -216,11 +218,7 @@ function hardMode(game,board) {
     $(this).addClass("clickedOne");
 
     done = checkGame(squaresFilled);
-    markedSpaces = function(){
-      var markedSpace = allSpaces. ((parseInt(this.id[5]) * 3 + parseInt(this.id[6])) , 1, ''); //remove marked space from open space array
-      markedSpaces.unshift(markedSpace); //move marked space to marked space array at index 0
-    }
-    // allSpaces.splice((parseInt(this.id[5]) * 3 + parseInt(this.id[6])) , 1, '');
+    allSpaces.splice((parseInt(this.id[5]) * 3 + parseInt(this.id[6])) , 1, '');
     openSpaces = allSpaces.filter(arr => arr != '');
     if (done) {
       if (game.turn == 1) {
@@ -228,22 +226,102 @@ function hardMode(game,board) {
       } else {
         $("#result").text("Winner: Computer");
       }
+      gameOver = true;
       $(".openSquare").addClass("clickedOne");
       $(".openSquare").removeClass("openSquare");
     } else {
       game.endTurn();
+    }
 
-      // to do: take marked space array, check index 0 and determine where to mark based on index of player's move 
+    // if you need this explained, you are a coward
+    if (squaresFilled.length == 1) {
+      if (activeSpace.x == 1 && activeSpace.y == 1) {
+        compSquare = $("#space00");
+      } else {
+        compSquare = $("#space11");
+      }
+    } else if (squaresFilled.length == 3) {
+      if (compSquare[0] == $("#space00")[0]) {
+        if (activeSpace.x == 2 && activeSpace.y == 2) {
+          compSquare = $("#space02");
+        } else {
+          compSquare = $("#space" + (2 - activeSpace.x) + (2 - activeSpace.y));
+        }
+      } else {
+        if ((squaresFilled[0].x == squaresFilled[2].x) && squaresFilled[0].x != 1) {
+          compSquare = $("#space" + (activeSpace.x) + (3 - (squaresFilled[0].y + squaresFilled[2].y)));
+        } else if ((squaresFilled[0].y == squaresFilled[2].y) && squaresFilled[0].y != 1) {
+          compSquare = $("#space" + (3 - (squaresFilled[0].x + squaresFilled[2].x)) + (activeSpace.y));
+        } else {
+          if ((squaresFilled[0].x == 2 - squaresFilled[2].x) && (squaresFilled[0].y == 2 - squaresFilled[2].y)) {
+            if (!((squaresFilled[0].y == 1) || (squaresFilled[2].x == 1))) {
+              compSquare = $("#space01");
+            } else {
+              compSquare = $("#space00");
+            }
+          } else {
+            compSquare = $("#space" + (3 - (squaresFilled[0].x + squaresFilled[2].x)) + (3 - (squaresFilled[0].y + squaresFilled[2].y)));
+          }
+        }
+      }
+    } else if (squaresFilled.length == 5) {
+      if ((squaresFilled[1].x == 1) && (squaresFilled[1].y == 1)) {
+        if (!((squaresFilled[4].x == (3 - (squaresFilled[1].x + squaresFilled[3].x))) && (squaresFilled[4].y == (3 - (squaresFilled[1].y + squaresFilled[3].y))))) {
+          compSquare = $("#space" + (3 - (squaresFilled[1].x + squaresFilled[3].x)) + (3 - (squaresFilled[1].y + squaresFilled[3].y)));
+        } else if ((squaresFilled[0].x == squaresFilled[4].x) && squaresFilled[0].x != 1) {
+          compSquare = $("#space" + (squaresFilled[4].x) + (3 - (squaresFilled[0].y + squaresFilled[4].y)));
+        } else if ((squaresFilled[4].x == squaresFilled[2].x) && squaresFilled[4].x != 1) {
+          compSquare = $("#space" + (squaresFilled[4].x) + (3 - (squaresFilled[2].y + squaresFilled[4].y)));
+        } else if ((squaresFilled[0].y == squaresFilled[4].y) && squaresFilled[0].y != 1) {
+          compSquare = $("#space" + (3 - (squaresFilled[0].x + squaresFilled[4].x)) + (squaresFilled[4].y));
+        } else if ((squaresFilled[4].y == squaresFilled[2].y) && squaresFilled[4].y != 1) {
+          compSquare = $("#space" + (3 - (squaresFilled[4].x + squaresFilled[2].x)) + (squaresFilled[4].y));
+        }
+      } else {
+        if ((((squaresFilled[1].x == squaresFilled[3].x) && squaresFilled[1].x != 1) || ((squaresFilled[1].y == squaresFilled[3].y) && squaresFilled[1].y != 1 )) && (!(((squaresFilled[4].x == (3 - (squaresFilled[1].x + squaresFilled[3].x))) && (squaresFilled[4].y == squaresFilled[1].y)) || ((squaresFilled[4].x == squaresFilled[1].x) && (squaresFilled[4].y == (3 - (squaresFilled[1].y + squaresFilled[3].y))))))) {
+          if (squaresFilled[1].x == squaresFilled[3].x) {
+            compSquare = $("#space" + (squaresFilled[1].x) + (3 - (squaresFilled[1].y + squaresFilled[3].y)));
+          } else {
+            compSquare = $("#space" + (3 - (squaresFilled[1].x + squaresFilled[3].x)) + (squaresFilled[1].y));
+          }
+        } else {
+          if ((squaresFilled[4].x == squaresFilled[0].x)) {
+            compSquare = $("#space" + squaresFilled[0].x + (3 - (squaresFilled[4].y + squaresFilled[0].y)));
+          } else if ((squaresFilled[4].y == squaresFilled[0].y)) {
+            compSquare = $("#space" + (3 - (squaresFilled[4].x + squaresFilled[0].x)) + squaresFilled[0].y );
+          } else {
+            compSquare = $("#space" + (2 - squaresFilled[4].x) + (2 - squaresFilled[4].y));
+          }
+        }
+      }
+    } else if (squaresFilled.length == 7) {
+      if ((squaresFilled[1].x == 1) && (squaresFilled[1].y == 1)) {
+        if (!((squaresFilled[6].x == (2 - squaresFilled[5].x)) && (squaresFilled[6].y == (2 - squaresFilled[5].y)))) {
+          compSquare = $("#space" + (2 - squaresFilled[5].x) + (2 - squaresFilled[5].y));
+        } else {
+          var index = openSpaces[parseInt(Math.random()*2)];
+          compSquare = $("#space" + index.x + index.y);
+        }
+      } else {
+        var index = openSpaces[parseInt(Math.random()*2)];
+        compSquare = $("#space" + index.x + index.y);
+      }
+    } else {
+      if (!done) {
+        $("#result").text("DRAW: No winner");
 
-      compX = openSpaces[compChoice].x;
-      compY = openSpaces[compChoice].y;
-      compSquare = $("#space" + compX + compY);
+        $(".openSquare").addClass("clickedOne");
+        $(".openSquare").removeClass("openSquare");
+      }
+      gameOver = true;
+      $("#new-game").toggle();
+    }
+    if (!gameOver) {
+      activePlayer = "player" + game.turn;
 
-      var activePlayer = "player" + game.turn;
+      compSquare.append("<h1 class='markedCell'>" + game[activePlayer].mark + "</h1>");
 
-      $(compSquare).append("<h1 class='markedCell'>" + game[activePlayer].mark + "</h1>");
-
-      var activeSpace = board.find(compSquare[0].id[5],compSquare[0].id[6]);
+      activeSpace = board.find(compSquare[0].id[5],compSquare[0].id[6]);
       activeSpace.mark(game[activePlayer].mark);
       squaresFilled.push(activeSpace);
       compSquare.removeClass("openSquare");
@@ -252,7 +330,15 @@ function hardMode(game,board) {
       done = checkGame(squaresFilled);
       allSpaces.splice((parseInt(compSquare[0].id[5]) * 3 + parseInt(compSquare[0].id[6])) , 1, '');
       openSpaces = allSpaces.filter(arr => arr != '');
-      game.endTurn();
+      if (done) {
+        $("#result").text("Winner: Computer");
+
+        $(".openSquare").addClass("clickedOne");
+        $(".openSquare").removeClass("openSquare");
+        $("#new-game").toggle();
+      } else {
+        game.endTurn();
+      }
     }
   });
 }
@@ -268,4 +354,8 @@ $(document).ready(function() {
   $("#twoPlayer").click(function() {
     twoPlayer(newGame,newBoard);
   });
+  $("#new-game").click(function() {
+    location.reload();
+  });
+
 });
