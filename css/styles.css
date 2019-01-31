@@ -5,6 +5,10 @@
   margin: 20px;
 }
 
+#result, #board, #dif-well {
+  display: none;
+}
+
 .clickedOne {
   height: 200px;
   width: 200px;

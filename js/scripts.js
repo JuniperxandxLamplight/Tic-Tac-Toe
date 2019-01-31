@@ -8,14 +8,6 @@ function Space(x,y) {
   this.player = "";
 }
 
-Space.prototype.xCoordinate = function() {
-  return this.x;
-}
-
-Space.prototype.yCoordinate = function() {
-  return this.y;
-}
-
 Space.prototype.mark = function(player) {
   this.player = player;
 }
@@ -97,31 +89,183 @@ var winner = 0;
 var squaresFilled = [];
 var done = false;;
 
-$(document).ready(function() {
-  var newGame = new Game;
-  var newBoard = newGame.board;
-  newBoard.build();
+function twoPlayer(game,board) {
+  $("#result").toggle();
+  $("#board").toggle();
+  $("#btn-well").toggle();
+
+  $("#result").text("Player " + game.turn + "'s Turn");
 
   $("#board").on("click",".openSquare", function() {
 
-    var activePlayer = "player" + newGame.turn;
+    var activePlayer = "player" + game.turn;
 
-    $(this).append("<h1 class='markedCell'>" + newGame[activePlayer].mark + "</h1>");
+    $(this).append("<h1 class='markedCell'>" + game[activePlayer].mark + "</h1>");
 
-    var activeSpace = newBoard.find(this.id[5],this.id[6]);
-    activeSpace.mark(newGame[activePlayer].mark);
+    var activeSpace = board.find(this.id[5],this.id[6]);
+    activeSpace.mark(game[activePlayer].mark);
     squaresFilled.push(activeSpace);
     $(this).removeClass("openSquare");
     $(this).addClass("clickedOne");
 
     done = checkGame(squaresFilled);
-
     if (done) {
-      $("#result").text("Winner: Player " + newGame.turn);
+      $("#result").text("Winner: Player " + game.turn);
       $(".openSquare").addClass("clickedOne");
       $(".openSquare").removeClass("openSquare");
     } else {
-      newGame.endTurn();
+      game.endTurn();
+      $("#result").text("Player " + game.turn + "'s Turn");
     }
+  });
+}
+
+function onePlayer(game,board) {
+  $("#btn-well").toggle();
+  $("#dif-well").toggle();
+  $("#easy").click(function() {
+    $("#dif-well").toggle();
+    easyMode(game,board);
+  });
+  $("#hard").click(function() {
+    $("#dif-well").toggle();
+    hardMode(game,board);
+  });
+}
+
+function easyMode(game,board) {
+  $("#result").toggle();
+  $("#board").toggle();
+  var allSpaces = board.spaces;
+  var openSpaces = [];
+  var gameOver = false;
+  var compChoice;
+  var compX;
+  var compY;
+
+  $("#board").on("click",".openSquare", function() {
+    var activePlayer = "player" + game.turn;
+
+    $(this).append("<h1 class='markedCell'>" + game[activePlayer].mark + "</h1>");
+
+    var activeSpace = board.find(this.id[5],this.id[6]);
+    activeSpace.mark(game[activePlayer].mark);
+    squaresFilled.push(activeSpace);
+    $(this).removeClass("openSquare");
+    $(this).addClass("clickedOne");
+
+    done = checkGame(squaresFilled);
+    allSpaces.splice((parseInt(this.id[5]) * 3 + parseInt(this.id[6])) , 1, '');
+    openSpaces = allSpaces.filter(arr => arr != '');
+    if (done) {
+      if (game.turn == 1) {
+        $("#result").text("Winner: Human");
+      } else {
+        $("#result").text("Winner: Computer");
+      }
+      $(".openSquare").addClass("clickedOne");
+      $(".openSquare").removeClass("openSquare");
+    } else {
+      game.endTurn();
+
+
+      compChoice = Math.floor((openSpaces.length) * Math.random());
+      compX = openSpaces[compChoice].x;
+      compY = openSpaces[compChoice].y;
+      compSquare = $("#space" + compX + compY);
+
+      var activePlayer = "player" + game.turn;
+
+      $(compSquare).append("<h1 class='markedCell'>" + game[activePlayer].mark + "</h1>");
+
+      var activeSpace = board.find(compSquare[0].id[5],compSquare[0].id[6]);
+      activeSpace.mark(game[activePlayer].mark);
+      squaresFilled.push(activeSpace);
+      compSquare.removeClass("openSquare");
+      compSquare.addClass("clickedOne");
+
+      done = checkGame(squaresFilled);
+      allSpaces.splice((parseInt(compSquare[0].id[5]) * 3 + parseInt(compSquare[0].id[6])) , 1, '');
+      openSpaces = allSpaces.filter(arr => arr != '');
+      game.endTurn();
+    }
+  });
+
+}
+
+function hardMode(game,board) {
+  $("#result").toggle();
+  $("#board").toggle();
+  var allSpaces = board.spaces;
+  var openSpaces = [];
+  var markedSpaces = [];
+  var gameOver = false;
+  var compChoice;
+  var compX;
+  var compY;
+
+  $("#board").on("click",".openSquare", function() {
+    var activePlayer = "player" + game.turn;
+
+    $(this).append("<h1 class='markedCell'>" + game[activePlayer].mark + "</h1>");
+
+    var activeSpace = board.find(this.id[5],this.id[6]);
+    activeSpace.mark(game[activePlayer].mark);
+    squaresFilled.push(activeSpace);
+    $(this).removeClass("openSquare");
+    $(this).addClass("clickedOne");
+
+    done = checkGame(squaresFilled);
+    markedSpaces = function(){
+      var markedSpace = allSpaces. ((parseInt(this.id[5]) * 3 + parseInt(this.id[6])) , 1, ''); //remove marked space from open space array
+      markedSpaces.unshift(markedSpace); //move marked space to marked space array at index 0
+    }
+    // allSpaces.splice((parseInt(this.id[5]) * 3 + parseInt(this.id[6])) , 1, '');
+    openSpaces = allSpaces.filter(arr => arr != '');
+    if (done) {
+      if (game.turn == 1) {
+        $("#result").text("Winner: Human");
+      } else {
+        $("#result").text("Winner: Computer");
+      }
+      $(".openSquare").addClass("clickedOne");
+      $(".openSquare").removeClass("openSquare");
+    } else {
+      game.endTurn();
+
+      // to do: take marked space array, check index 0 and determine where to mark based on index of player's move 
+
+      compX = openSpaces[compChoice].x;
+      compY = openSpaces[compChoice].y;
+      compSquare = $("#space" + compX + compY);
+
+      var activePlayer = "player" + game.turn;
+
+      $(compSquare).append("<h1 class='markedCell'>" + game[activePlayer].mark + "</h1>");
+
+      var activeSpace = board.find(compSquare[0].id[5],compSquare[0].id[6]);
+      activeSpace.mark(game[activePlayer].mark);
+      squaresFilled.push(activeSpace);
+      compSquare.removeClass("openSquare");
+      compSquare.addClass("clickedOne");
+
+      done = checkGame(squaresFilled);
+      allSpaces.splice((parseInt(compSquare[0].id[5]) * 3 + parseInt(compSquare[0].id[6])) , 1, '');
+      openSpaces = allSpaces.filter(arr => arr != '');
+      game.endTurn();
+    }
+  });
+}
+
+$(document).ready(function() {
+  var newGame = new Game;
+  var newBoard = newGame.board;
+  newBoard.build();
+
+  $("#onePlayer").click(function() {
+    onePlayer(newGame,newBoard);
+  });
+  $("#twoPlayer").click(function() {
+    twoPlayer(newGame,newBoard);
   });
 });
